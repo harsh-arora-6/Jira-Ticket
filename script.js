@@ -14,13 +14,20 @@ let locked = true;
 let removeTicket = false;
 let ticketsArr = [];
 
+// if already elements present in local storage => display them
+if(localStorage.getItem("jira_tickets")){
+    ticketsArr = JSON.parse(localStorage.getItem("jira_tickets"));
+    for(let ticket of ticketsArr){
+        createTicket(ticket.ticketCol,ticket.ticketId,ticket.taskArea);
+    }
+}
 for(let i = 0;i < toolboxColors.length;i++){
     // click a toolbox color to get only those colored tickets
     toolboxColors[i].addEventListener('click',(e)=>{
         let newTicketsArr = ticketsArr.filter((ticket)=>{
             return toolboxColors[i].classList[0] === ticket.ticketCol;
         })
-        let allTickets = document.querySelectorAll('.ticket-cont');
+        let allTickets = document.querySelectorAll('.ticket-cont');// access tickets and remove
         for(let j = 0;j < allTickets.length;j++){
             allTickets[j].remove();
         }
@@ -49,6 +56,9 @@ addBtn.addEventListener('click',(e)=>{
         textareaCont.value = "";
     }
 })
+removeBtn.addEventListener("click",(e)=>{
+    removeTicket = !removeTicket;
+});
 
 allPriorityColors.forEach((colorElement)=>{
     colorElement.addEventListener("click",(e)=>{
@@ -73,29 +83,40 @@ function createTicket(ticketCol,ticketId,taskArea){
     ticket.setAttribute("class","ticket-cont");
     ticket.innerHTML = `<div class="ticket-color ${ticketCol}"></div>
     <div class="ticket-id">${id}</div>
-    <div class="task-area">${taskArea}</div>
+    <div class="task-area" spellcheck="false">${taskArea}</div>
     <div class="ticket-lock">
           <i class="fa-solid fa-lock"></i>
         </div>`;
     mainCont.appendChild(ticket);
     // add ticket to array if ticket is newly created
-    if(!ticketId)ticketsArr.push({ticketCol,ticketId:id,taskArea});
-    handleColor(ticket);
-    handleLock(ticket);
-    handleRemoval(ticket);
+    if(!ticketId){
+        ticketsArr.push({ticketCol,ticketId:id,taskArea});
+        localStorage.setItem("jira_tickets",JSON.stringify(ticketsArr));
+    }
+    handleColor(ticket,id);
+    handleLock(ticket,id);
+    handleRemoval(ticket,id);
+}
+// get index of ticket in ticketsArr using ticketId
+function getTicketIdx(id){
+    return ticketsArr.findIndex((ticket)=>{
+        return ticket.ticketId === id;
+    })
 }
 // after activating remove mode ,by clicking on a ticket we can remove it
-function handleRemoval(ticket){
+function handleRemoval(ticket,id){
     
-    removeBtn.addEventListener("click",(e)=>{
-        removeTicket = !removeTicket;
-    });
     ticket.addEventListener("click",(e)=>{
-        if(removeTicket)ticket.remove();
+        if(removeTicket){
+            let ticketIdx = getTicketIdx(id);
+            ticketsArr.splice(ticketIdx,1);
+            localStorage.setItem("jira_tickets",JSON.stringify(ticketsArr));// database removal
+            ticket.remove();//ui removal
+        }
     })
 }
 // adding lock-unlock functionality to disable-enable editing in a ticket
-function handleLock(ticket){
+function handleLock(ticket,id){
     let ticketLockElem = ticket.children[3].children[0];
     let lockedClass = "fa-lock";
     let unlockedClass = "fa-lock-open";
@@ -111,11 +132,16 @@ function handleLock(ticket){
             ticketLockElem.classList.add(unlockedClass);
             ticketTask.setAttribute("contenteditable","true");
         }
+        // update tickets in database 
+        let ticketIdx = getTicketIdx(id);
+        ticketsArr[ticketIdx].taskArea = ticketTask.innerText;
+        localStorage.setItem("jira_tickets",JSON.stringify(ticketsArr));
     })
 }
 // clicking on ticket color element to get next ticket color
-function handleColor(ticket){
+function handleColor(ticket,id){
     let ticketColElem = ticket.children[0];
+    let ticketIdx = getTicketIdx(id);
     ticketColElem.addEventListener("click",(e) => {
         let ticketCol = ticketColElem.classList[1];
         let currentColId = colors.findIndex((col,idx) =>{
@@ -124,6 +150,8 @@ function handleColor(ticket){
         currentColId = (currentColId+1)%colors.length;
         ticketColElem.classList.remove(ticketCol);
         ticketColElem.classList.add(colors[currentColId]);
+        ticketsArr[ticketIdx].ticketCol = colors[currentColId];
+        localStorage.setItem("jira_tickets",JSON.stringify(ticketsArr));
     })
 }
 //reset the modal
