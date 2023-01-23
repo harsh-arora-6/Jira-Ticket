@@ -182,3 +182,101 @@ body {
 i:hover {
     cursor: pointer;
 }
+
+@media screen and (min-width:426px) and (max-width:768px) {
+
+    .toolbox-cont>* {
+        margin-left: 5rem;
+        border-radius: 10px;
+    }
+
+    .toolbox-priority-cont {
+        width: 30%;
+    }
+
+    .toolbox-action-cont {
+        width: 20%;
+    }
+
+    .toolbox-action-cont>* {
+        font-size: 1.5rem;
+    }
+
+    .modal-cont {
+        height: 25rem;
+        width: 30rem;
+        position: absolute;
+        top: calc((100vh - 25rem)/2);
+        left: calc((100vw - 30rem)/2);
+        display: none;
+    }
+
+    .priority-color {
+        height: 2.8rem;
+        width: 45%;
+    }
+
+    .ticket-cont {
+        width: 18rem;
+    }
+}
+
+@media screen and (max-width:425px) {
+
+    .toolbox-cont>* {
+        margin-left: 2rem;
+        border-radius: 10px;
+    }
+
+    .toolbox-priority-cont {
+        width: 50%;
+    }
+
+    .toolbox-action-cont {
+        width: 20%;
+    }
+
+    .toolbox-action-cont>* {
+        font-size: 1.5rem;
+        width: 50%;
+    }
+
+    .modal-cont {
+        height: 30rem;
+        width: 90%;
+        position: absolute;
+        top: calc((100vh - 30rem)/2);
+        left: calc((100vw - 70%)/2);
+        display: none;
+        flex-direction: column;
+    }
+
+    .textarea-cont {
+        height: 100%;
+        resize: none;
+        width: 80%;
+        border: none;
+        outline: none;
+        padding: 5%;
+        font-size: 1.5rem;
+    }
+
+    .priority-colors-cont {
+        height: 30%;
+        width: 80%;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        align-items: center;
+    }
+
+    .priority-color {
+        height: 3rem;
+        width: 20%;
+        cursor: pointer;
+    }
+
+    .ticket-cont {
+        width: 18rem;
+    }
+}
